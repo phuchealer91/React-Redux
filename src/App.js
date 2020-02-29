@@ -21,35 +21,35 @@ export default class App extends Component {
        }
     }
     
-    onGenerate = () => {
-        var tasksValue = [
-            {
-                id: uuidv4(),                
-                name: 'Hoc lap trinh mien phi F8',
-                status: true
-            },
-            {
-                id: uuidv4(),       
-                name: 'Di boi',
-                status: false
-            },
-            {
-                id: uuidv4(),       
-                name: 'Di cong vien',
-                status: true
-            }
-        ];
-        // console.log(tasks);
-        this.setState({
-            tasksKey: tasksValue
-        })
-        localStorage.setItem("tasksKey", JSON.stringify(tasksValue)); //covert dữ liệu object -> string
+    // onGenerate = () => {
+    //     var tasksValue = [
+    //         {
+    //             id: uuidv4(),                
+    //             name: 'Hoc lap trinh mien phi F8',
+    //             status: true
+    //         },
+    //         {
+    //             id: uuidv4(),       
+    //             name: 'Di boi',
+    //             status: false
+    //         },
+    //         {
+    //             id: uuidv4(),       
+    //             name: 'Di cong vien',
+    //             status: true
+    //         }
+    //     ];
+    //     // console.log(tasks);
+    //     this.setState({
+    //         tasksKey: tasksValue
+    //     })
+    //     localStorage.setItem("tasksKey", JSON.stringify(tasksValue)); //covert dữ liệu object -> string
 
-    }
+    // }
     //Hàm thay đổi trạng thái ẩn, hiện của task form
     onToggleTaskForm = () => {
         this.setState({
-            isDisplayForm : !this.state.isDisplayForm
+            isDisplayForm : true
         })
     }
     //Hàm nhận props được truyền từ component con (taskForm) để thực hiện thay đổi trạng thái ẩn form
@@ -58,12 +58,32 @@ export default class App extends Component {
             isDisplayForm : false
         })
     }
-
+    // Hàm lấy dữ liệu từ con (TaskForm) thông qua props
+    onGetTaskForm = (data) => { //data chứa dữ liệu từ con (TaskForm) chuyển sang  
+       var {tasksKey} = this.state;
+       data.id = uuidv4(); //dòng này gán id mới cho object đồng thời trả về 1 object mới được thêm vào
+       tasksKey.push(data); //gán object mới này vào array trên state
+       this.setState({
+           tasksKey: tasksKey
+       });
+    //    Típ tục lưu dữ liệu bằng localStorage
+       localStorage.setItem('tasksKey',JSON.stringify(tasksKey));
+        
+    }
+    // 
+    // sortDescending = () => {
+    //     const { prices } = this.state;
+    //     prices.sort((a, b) => a - b).reverse()
+    //     this.setState({ prices })
+    //   }
     render() {
         //lấy dữ liệu từ state 
         var {isDisplayForm,tasksKey} = this.state; // var tasksKey = this.state.tasksKey;
         // props onRetriveForm để thông qua component con (TaskForm) thực hiện hàm
-        var elementTaskForm = (isDisplayForm === true) ? <TaskForm onRetriveForm={this.onCloseForm}/> : '';
+        var elementTaskForm = (isDisplayForm === true) ? <TaskForm 
+                                                                    onRetriveForm={this.onCloseForm} //props đóng form
+                                                                    onRetriveTaskForm={this.onGetTaskForm} //props để thêm dữ liệu vào 
+                                                                    /> : '';
         return (
             <div>
                 <h2 className="text-center mt-4 mb-4">Quản lý công việc</h2>
@@ -84,12 +104,12 @@ export default class App extends Component {
                                 &nbsp;Thêm công việc
             
                             </button>
-                            <button 
+                            {/* <button 
                             className="btn btn-danger ml-2"
                             onClick={this.onGenerate}
                             >                              
                             Generate
-                            </button>
+                            </button> */}
                             {/* Control Search - Sort*/}
                             <Control />
                             
