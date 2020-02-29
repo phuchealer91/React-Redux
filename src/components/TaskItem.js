@@ -2,12 +2,14 @@ import React, { Component } from 'react'
 
 export default class TaskItem extends Component {
     render() {
+        //gọi biến để lấy dữ liệu từ component cha (TaskList) thông qua props
         var {index,taskList}= this.props;
         return (
                 <tr>
                     <td>{index+1}</td>
                     <td>{taskList.name}</td>
                     <td>
+                    {/* Check điều kiện của status */}
                     <span 
                     className={taskList.status === true ? "badge badge-success" : "badge badge-danger"}
                     >{taskList.status === true ? "Kích hoạt" : "Ẩn"}</span></td>

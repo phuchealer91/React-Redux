@@ -7,15 +7,16 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            tasksKey : [] //luu tru cac ten cong viec
+            tasksKey : [], //luu tru cac ten cong viec
+            isDisplayForm: false // Trang thai an hoac hien form
         }
     }
-
+    //Sử dụng componentWillMount để đổ dữ liệu vào tasksKey trk khi render 
     UNSAFE_componentWillMount() {
-       if(localStorage && localStorage.getItem('tasksKey')){
-           var tasks = JSON.parse(localStorage.getItem('tasksKey'));
+       if(localStorage && localStorage.getItem('tasksKey')){ //kiểm tra có tồn tại localStorage và localStorage có dữ liệu của key là TasksKey không 
+           var tasks = JSON.parse(localStorage.getItem('tasksKey')); //covert data từ string sang object
             this.setState({
-                tasksKey : tasks
+                tasksKey : tasks //gọi lại setState để lưu dữ liệu
             })
        }
     }
@@ -40,25 +41,45 @@ export default class App extends Component {
         ];
         // console.log(tasks);
         this.setState({
-            tasks: tasks
+            tasksKey: tasksValue
         })
-        localStorage.setItem("tasksKey", JSON.stringify(tasksValue)); //change object -> string
+        localStorage.setItem("tasksKey", JSON.stringify(tasksValue)); //covert dữ liệu object -> string
 
+    }
+    //Hàm thay đổi trạng thái ẩn, hiện của task form
+    onToggleTaskForm = () => {
+        this.setState({
+            isDisplayForm : !this.state.isDisplayForm
+        })
+    }
+    //Hàm nhận props được truyền từ component con (taskForm) để thực hiện thay đổi trạng thái ẩn form
+    onCloseForm = () => {
+        this.setState({
+            isDisplayForm : false
+        })
     }
 
     render() {
-        var {tasksKey} = this.state; // var tasksKey = this.state.tasksKey;
+        //lấy dữ liệu từ state 
+        var {isDisplayForm,tasksKey} = this.state; // var tasksKey = this.state.tasksKey;
+        // props onRetriveForm để thông qua component con (TaskForm) thực hiện hàm
+        var elementTaskForm = (isDisplayForm === true) ? <TaskForm onRetriveForm={this.onCloseForm}/> : '';
         return (
             <div>
                 <h2 className="text-center mt-4 mb-4">Quản lý công việc</h2>
                 <div className="container">
                     <div className="row">
-                        <div className="col-sm-12 col-md-4">
+                    {/* Check điều kiện isDisplayForm */}
+                        <div className={isDisplayForm === true ? "col-sm-12 col-md-4" : " "}>
                             {/* TaskForm */}
-                            <TaskForm />
+                            {elementTaskForm}
                         </div>
-                        <div className="col-sm-12 col-md-8">
-                            <button className="btn btn-success">
+                        {/* Check điều kiện isDisplayForm để hiển thị component*/}
+                        <div className={isDisplayForm === true ? "col-sm-12 col-md-8" : "col-sm-12 col-md-12"}>
+                            <button 
+                            className="btn btn-success"
+                            onClick={this.onToggleTaskForm} //Bắt sự kiện click -> hiện, ẩn task form
+                            >
                                 <i className="fa fa-plus-circle"></i>
                                 &nbsp;Thêm công việc
             
@@ -73,6 +94,7 @@ export default class App extends Component {
                             <Control />
                             
                             {/* TaskList - Table */}
+                            {/* tạo props để chuyển dữ liệu từ component cha (App) sang component con (TaskList) */}
                                 <TaskList tasksParent={tasksKey}/>
                             </div>
                         </div>

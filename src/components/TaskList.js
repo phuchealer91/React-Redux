@@ -3,8 +3,11 @@ import TaskItem from './TaskItem'
 
 export default class TaskList extends Component {
     render() {
+        //gọi biến để lấy dữ liệu từ component cha (App) thông qua props
         var {tasksParent} = this.props;
+        // Map dữ liệu ra cho từng TaskItem
         var elements = tasksParent.map((task,index)=>{
+            //Tạo props để từ cha (TaskList) đổ sang con (TaskItem) 
             return <TaskItem 
                     key={task.id}
                     index={index}
