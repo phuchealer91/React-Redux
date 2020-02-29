@@ -32,7 +32,18 @@ export default class TaskForm extends Component {
         // console.log(this.state);
         // lấy dữ liệu từ state và đổ sang cha (App) thông qua props là onRetriveTaskForm
         this.props.onRetriveTaskForm(this.state);
+        // Hàm rest form
+        this.onClearForm();
+        //hàm đóng form
+        this.onHandleCloseForm();
     }
+    //
+    onClearForm = () => {
+        this.setState({
+            name: '',
+            status: true
+        })
+    } 
 
     render() {
         // 
@@ -73,12 +84,12 @@ export default class TaskForm extends Component {
                             </select>
                         </div>
                         <div className="form-group text-center">
-                            <button type="submit" className="btn btn-success"><i className="fa fa-check"></i> Save</button>
+                            <button type="submit" className="btn btn-success"><i className="fa fa-check"></i> Lưu</button>
                             <button 
                             type="button" 
                             className="btn btn-danger ml-2"
-                            onClick={this.onHandleCloseForm} //Thực hiện thao tác đóng form thay đổi trạng thái true -> false
-                            ><i className="fa fa-times"></i> Canel</button>
+                            onClick={this.onClearForm} //Thực hiện thao tác reset form
+                            ><i className="fa fa-times"></i> Hủy</button>
                         </div>
                     </form>
                 </div>
