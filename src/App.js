@@ -3,6 +3,7 @@ import TaskForm from './components/TaskForm'
 import Control from './components/Control'
 import TaskList from './components/TaskList'
 import { v4 as uuidv4 } from 'uuid';
+import "./App.css";
 export default class App extends Component {
     constructor(props) {
         super(props);
@@ -70,12 +71,30 @@ export default class App extends Component {
        localStorage.setItem('tasksKey',JSON.stringify(tasksKey));
         
     }
-    // 
-    // sortDescending = () => {
-    //     const { prices } = this.state;
-    //     prices.sort((a, b) => a - b).reverse()
-    //     this.setState({ prices })
-    //   }
+    //hàm lấy id từ con (TaskList) - con (TaskItem)
+    onUpdate = (id) => {
+        var {tasksKey} = this.state;
+        var indexTask = this.findIndexTask(id); //biến để trả về giá trị index của object
+        if(indexTask !== -1){ //Giá trị indexTask (index) có tồn tại
+            tasksKey[indexTask].status = !tasksKey[indexTask].status; //trỏ từ arr tasksKey của index đó tới status
+            this.setState({
+                tasksKey: tasksKey //Cập nhật lại setState
+            })
+        //    Típ tục lưu dữ liệu bằng localStorage
+       localStorage.setItem('tasksKey',JSON.stringify(tasksKey));
+        }
+    }
+    // Hàm tìm vị trí index từ id
+    findIndexTask = (id) => {
+        var {tasksKey} = this.state;
+        var result = -1; //gán ban đầu giá trị -1
+        tasksKey.forEach((task,index)=>{ //dùng foreach để lặp qua các object 
+            if(task.id === id){ //nếu object có id trùng với id click thì trả về index
+                result = index;
+            }
+        })
+        return result;
+    }
     render() {
         //lấy dữ liệu từ state 
         var {isDisplayForm,tasksKey} = this.state; // var tasksKey = this.state.tasksKey;
@@ -115,7 +134,10 @@ export default class App extends Component {
                             
                             {/* TaskList - Table */}
                             {/* tạo props để chuyển dữ liệu từ component cha (App) sang component con (TaskList) */}
-                                <TaskList tasksParent={tasksKey}/>
+                                <TaskList 
+                                tasksParent={tasksKey}
+                                onUpdateStatus={this.onUpdate}
+                                />
                             </div>
                         </div>
                     </div>

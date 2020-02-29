@@ -12,6 +12,7 @@ export default class TaskList extends Component {
                     key={task.id}
                     index={index}
                     taskList={task}
+                    onUpdateStatusItem={this.props.onUpdateStatus}
                     />
         })
         return (
