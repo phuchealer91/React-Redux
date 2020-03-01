@@ -2,6 +2,28 @@ import React, { Component } from 'react'
 import TaskItem from './TaskItem'
 
 export default class TaskList extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            filterName: '',
+            filterStatus: -1
+        }
+    }
+
+    //Hàm để truyền dữ liệu sang cha (App) filter task
+    onHandleFilter = (event) => {
+        var target = event.target;
+        var name = target.name;
+        var value = target.value;
+        this.props.onFilterTask(
+            name === "filterName" ? value : this.state.filterName,
+            name === "filterStatus" ? value : this.state.filterStatus
+        )
+        this.setState({
+            [name]: value
+        })
+    }
+    
     render() {
         //gọi biến để lấy dữ liệu từ component cha (App) thông qua props
         var {tasksParent} = this.props;
@@ -33,17 +55,25 @@ export default class TaskList extends Component {
                             <td></td>
                             <td>
                                 <div className="form-group">
-                                    <form action="">
-                                        <input type="text" placeholder="tim" className="form-control" />
-                                    </form>
+                                        <input 
+                                        type="text" 
+                                        placeholder="Tìm kiếm tên công việc" 
+                                        className="form-control" 
+                                        name="filterName"
+                                        onChange={this.onHandleFilter}
+                                        />
                                 </div>
                             </td>
                             <td>
                                 <div className="form-group">
-                                    <select name="" id="" className="form-control">
-                                        <option value="">Tất cả</option>
-                                        <option value="">Kích hoạt</option>
-                                        <option value="">Ẩn</option>
+                                    <select 
+                                    className="form-control"
+                                    name="filterStatus"
+                                    onChange={this.onHandleFilter}
+                                    >
+                                        <option value={-1}>Tất cả</option>
+                                        <option value={0}>Kích hoạt</option>
+                                        <option value={1}>Ẩn</option>
                                     </select>
                                 </div>
                             </td>

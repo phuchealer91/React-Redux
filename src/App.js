@@ -10,7 +10,11 @@ export default class App extends Component {
         this.state = {
             tasksKey : [], //luu tru cac ten cong viec
             isDisplayForm: false, // Trang thai an hoac hien form
-            taskEditting: null
+            taskEditting: null,
+            filters : {
+                name: '',
+                status: -1
+            }
         }
     }
     //Sử dụng componentWillMount để đổ dữ liệu vào tasksKey trk khi render 
@@ -130,6 +134,18 @@ export default class App extends Component {
     }
         this.onCloseForm();
     }
+
+    // Một hàm xóa khác dùng filter (task.id !== id) có nghĩa là nó sẽ pải thỏa điều kiện là lấy các giá trị
+    // còn lại và bỏ đi giá trị có id trùng nhau sau đó gán vào setState
+    // deleteItem = (id) => {
+    //     var { tasks } = this.state
+    //     var kqFilter = tasks.filter(task => task.id !== id)
+    //     this.setState({
+    //       tasks: kqFilter
+    //     })
+    //     localStorage.setItem('tasks', JSON.stringify(kqFilter))
+    //   }
+
     // hàm update item 
     onEdit = (id) => {
         var {tasksKey} = this.state;
@@ -140,6 +156,19 @@ export default class App extends Component {
         })
         this.onShowUpTaskForm(); //show task form lên
     }
+
+    //Hàm lấy data từ con (TaskList) cần tạo thêm 2 state để lưu dữ liệu tù bên con vào sử dụng
+    onFilter = (filterName,filterStatus) => {
+        filterStatus = parseInt(filterStatus); //covert string -> number 
+        //gán dữ liệu lấy đc vào 2 set mới tạo để sử dụng
+        this.setState({
+            filters : {
+                name: filterName.toLowerCase(),
+                status: filterStatus
+            }
+        })
+    }
+
     // Hàm tìm vị trí index từ id
     findIndexTask = (id) => {
         var {tasksKey} = this.state;
@@ -153,7 +182,25 @@ export default class App extends Component {
     }
     render() {
         //lấy dữ liệu từ state 
-        var {isDisplayForm,tasksKey,taskEditting} = this.state; // var tasksKey = this.state.tasksKey;
+        var {isDisplayForm,tasksKey,taskEditting,filters} = this.state; // var tasksKey = this.state.tasksKey;
+        //Đoạn script xử lý filter
+        if(filters){
+            if(filters.name){
+               tasksKey = tasksKey.filter((tasksKey)=>{
+                    return tasksKey.name.toLowerCase().indexOf(filters.name) !== -1; //!== -1 mới tồn tại
+                })
+            }
+            // ko cần check điều kiện filterStatus vì ko xử lý dữ liệu nhập vào (null,rỗng, != 0)
+            // Mà mặc định sẵn 3 giá trị -1, 0 ,1 rồi
+            tasksKey = tasksKey.filter((tasksKey)=>{
+                    if(filters.status === -1){ //-1 trả về all luôn
+                        return tasksKey;
+                    }
+                    else {
+                        return tasksKey.status === (filters.status === 0 ? true : false); //covert 1 vs 0 ra true và false
+                    }
+                })
+        }
         // props onRetriveForm để thông qua component con (TaskForm) thực hiện hàm
         var elementTaskForm = (isDisplayForm === true) 
                                             ? <TaskForm 
@@ -195,6 +242,7 @@ export default class App extends Component {
                             onUpdateStatus={this.onUpdate} //props truyền qua (TaskList) -> update
                             onDeleteId={this.onDelete} //props truyền qua (TaskList) -> delete
                             onEditId={this.onEdit}
+                            onFilterTask={this.onFilter}
                                 />
                             </div>
                         </div>
