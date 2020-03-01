@@ -71,7 +71,7 @@ export default class App extends Component {
        localStorage.setItem('tasksKey',JSON.stringify(tasksKey));
         
     }
-    //hàm lấy id từ con (TaskList) - con (TaskItem)
+    //hàm lấy id từ con (TaskList) - con (TaskItem) -> thực hiện update status
     onUpdate = (id) => {
         var {tasksKey} = this.state;
         var indexTask = this.findIndexTask(id); //biến để trả về giá trị index của object
@@ -83,6 +83,22 @@ export default class App extends Component {
         //    Típ tục lưu dữ liệu bằng localStorage
        localStorage.setItem('tasksKey',JSON.stringify(tasksKey));
         }
+    }
+    //hàm lấy id từ con (TaskList) - con (TaskItem) -> thực hiện xóa item
+    onDelete = (id) => {
+        var {tasksKey} = this.state;
+        var indexTask = this.findIndexTask(id); //biến để trả về giá trị index của object
+        if (window.confirm("Bạn có muốn xóa không?")) {
+        if(indexTask !== -1){ //Giá trị indexTask (index) có tồn tại
+            tasksKey.splice(indexTask,1); //Xóa 1 phần tử tại vị trí index
+            this.setState({
+                tasksKey: tasksKey //Cập nhật lại setState
+            })
+        //    Típ tục lưu dữ liệu bằng localStorage
+       localStorage.setItem('tasksKey',JSON.stringify(tasksKey));
+        }
+    }
+        this.onCloseForm();
     }
     // Hàm tìm vị trí index từ id
     findIndexTask = (id) => {
@@ -121,7 +137,6 @@ export default class App extends Component {
                             >
                                 <i className="fa fa-plus-circle"></i>
                                 &nbsp;Thêm công việc
-            
                             </button>
                             {/* <button 
                             className="btn btn-danger ml-2"
@@ -131,12 +146,12 @@ export default class App extends Component {
                             </button> */}
                             {/* Control Search - Sort*/}
                             <Control />
-                            
                             {/* TaskList - Table */}
                             {/* tạo props để chuyển dữ liệu từ component cha (App) sang component con (TaskList) */}
-                                <TaskList 
-                                tasksParent={tasksKey}
-                                onUpdateStatus={this.onUpdate}
+                            <TaskList 
+                            tasksParent={tasksKey}
+                            onUpdateStatus={this.onUpdate} //props truyền qua (TaskList) -> update
+                            onDeleteId={this.onDelete} //props truyền qua (TaskList) -> delete
                                 />
                             </div>
                         </div>
