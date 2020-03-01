@@ -9,6 +9,10 @@ export default class TaskItem extends Component {
     onHandleDelete = () => {
         this.props.onDeleteItem(this.props.taskList.id);
     }
+    // 
+    onHandleEdit = () => {
+        this.props.onEditItem(this.props.taskList.id);
+    }
 
     render() {
         //gọi biến để lấy dữ liệu từ component cha (TaskList) thông qua props
@@ -24,12 +28,16 @@ export default class TaskItem extends Component {
                     onClick={this.onHandleUpdate}
                     >{taskList.status === true ? "Kích hoạt" : "Ẩn"}</span></td>
                     <td>
-                        <a href="" className="btn btn-success"><i className="fas fa-pencil-alt"></i> Sửa</a>
-                        <a 
-                        href="" 
+                        <button 
+                        type="button" 
+                        className="btn btn-success"
+                        onClick={this.onHandleEdit}
+                        ><i className="fas fa-pencil-alt"></i> Sửa</button>
+                        <button
+                        type="button"
                         className="btn btn-danger ml-2"
                         onClick={this.onHandleDelete} //gọi sự kiện delete
-                        ><i className="fa fa-trash"></i> Xóa</a>
+                        ><i className="fa fa-trash"></i> Xóa</button>
                     </td>
                 </tr>
         )

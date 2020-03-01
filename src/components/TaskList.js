@@ -14,6 +14,7 @@ export default class TaskList extends Component {
                     taskList={task}
                     onUpdateStatusItem={this.props.onUpdateStatus} //props để truyền qua (TaskItem) -> update
                     onDeleteItem={this.props.onDeleteId} //props để truyền qua (TaslItem) -> xóa
+                    onEditItem={this.props.onEditId}
                     />
         })
         return (

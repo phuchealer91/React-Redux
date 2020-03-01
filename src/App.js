@@ -9,7 +9,8 @@ export default class App extends Component {
         super(props);
         this.state = {
             tasksKey : [], //luu tru cac ten cong viec
-            isDisplayForm: false // Trang thai an hoac hien form
+            isDisplayForm: false, // Trang thai an hoac hien form
+            taskEditting: null
         }
     }
     //Sử dụng componentWillMount để đổ dữ liệu vào tasksKey trk khi render 
@@ -49,6 +50,24 @@ export default class App extends Component {
     // }
     //Hàm thay đổi trạng thái ẩn, hiện của task form
     onToggleTaskForm = () => {
+        // kiểm tra điều kiện form đang hiện và data taskEditting không null 
+        // -> thực hiện giữ nguyên form hiện và thực hiện cho taskEditting bằng null
+        if(this.state.isDisplayForm && this.state.taskEditting !== null){
+        this.setState({
+            isDisplayForm : true,
+            taskEditting: null //fix khi ấn sửa -> ấn thêm cv thì nó ko reset lại form thêm cv mà vẫn giữ nguyên form cập nhật cv
+        })
+        }
+        // Ngược lại thì bình thường
+        else {
+            this.setState({
+                isDisplayForm : !this.state.isDisplayForm,
+                taskEditting: null //fix khi ấn sửa -> ấn thêm cv thì nó ko reset lại form thêm cv mà vẫn giữ nguyên form cập nhật cv
+            })
+        }
+    }
+    // Hàm thay đổi trạng thái hiện form
+    onShowUpTaskForm = () => {
         this.setState({
             isDisplayForm : true
         })
@@ -60,12 +79,23 @@ export default class App extends Component {
         })
     }
     // Hàm lấy dữ liệu từ con (TaskForm) thông qua props
-    onGetTaskForm = (data) => { //data chứa dữ liệu từ con (TaskForm) chuyển sang  
+    onGetTaskForm = (data) => { //data chứa dữ liệu từ con (TaskForm) chuyển sang
+        // console.log(data);  
        var {tasksKey} = this.state;
-       data.id = uuidv4(); //dòng này gán id mới cho object đồng thời trả về 1 object mới được thêm vào
-       tasksKey.push(data); //gán object mới này vào array trên state
+    //    add new task
+       if(data.id === ''){
+        data.id = uuidv4(); //dòng này gán id mới cho object đồng thời trả về 1 object mới được thêm vào
+        tasksKey.push(data); //gán object mới này vào array trên state
+       }
+    //    editing
+       else{
+        var indexTask = this.findIndexTask(data.id);
+        tasksKey[indexTask] = data;
+       }
+  
        this.setState({
-           tasksKey: tasksKey
+           tasksKey: tasksKey,
+           taskEditting: null
        });
     //    Típ tục lưu dữ liệu bằng localStorage
        localStorage.setItem('tasksKey',JSON.stringify(tasksKey));
@@ -100,6 +130,16 @@ export default class App extends Component {
     }
         this.onCloseForm();
     }
+    // hàm update item 
+    onEdit = (id) => {
+        var {tasksKey} = this.state;
+        var indexTask = this.findIndexTask(id); //biến để trả về giá trị index của object
+        var taskEditting = tasksKey[indexTask]; //Tạo ra state taskEditting để lưu data update gán task với index tương ứng
+        this.setState({
+            taskEditting: taskEditting
+        })
+        this.onShowUpTaskForm(); //show task form lên
+    }
     // Hàm tìm vị trí index từ id
     findIndexTask = (id) => {
         var {tasksKey} = this.state;
@@ -113,12 +153,14 @@ export default class App extends Component {
     }
     render() {
         //lấy dữ liệu từ state 
-        var {isDisplayForm,tasksKey} = this.state; // var tasksKey = this.state.tasksKey;
+        var {isDisplayForm,tasksKey,taskEditting} = this.state; // var tasksKey = this.state.tasksKey;
         // props onRetriveForm để thông qua component con (TaskForm) thực hiện hàm
-        var elementTaskForm = (isDisplayForm === true) ? <TaskForm 
-                                                                    onRetriveForm={this.onCloseForm} //props đóng form
-                                                                    onRetriveTaskForm={this.onGetTaskForm} //props để thêm dữ liệu vào 
-                                                                    /> : '';
+        var elementTaskForm = (isDisplayForm === true) 
+                                            ? <TaskForm 
+                                            onRetriveForm={this.onCloseForm} //props đóng form
+                                            onRetriveTaskForm={this.onGetTaskForm} //props để thêm dữ liệu vào
+                                             taskEdit={taskEditting}
+                                            /> : '';
         return (
             <div>
                 <h2 className="text-center mt-4 mb-4">Quản lý công việc</h2>
@@ -152,6 +194,7 @@ export default class App extends Component {
                             tasksParent={tasksKey}
                             onUpdateStatus={this.onUpdate} //props truyền qua (TaskList) -> update
                             onDeleteId={this.onDelete} //props truyền qua (TaskList) -> delete
+                            onEditId={this.onEdit}
                                 />
                             </div>
                         </div>

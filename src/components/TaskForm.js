@@ -4,11 +4,47 @@ export default class TaskForm extends Component {
         constructor(props) {
             super(props);
             this.state = {
+                id: '', //bổ sung thêm state id để update item
                 name: '', //trùng với name ở dưới
                 status: true //trùng với name ở dưới
             }
         }
         
+    // dùng lifecycle để giải quyết đưa dữ liệu cần cập nhật vào trước khi render
+    UNSAFE_componentWillMount() {
+        if(this.props.taskEdit){
+            this.setState({
+                id: this.props.taskEdit.id,
+                name: this.props.taskEdit.name,
+                status: this.props.taskEdit.status
+            }) 
+        }
+    }
+    // fix bug khi form đang ở trạng thái thêm cv thì ấn sửa thì ko được 
+    // SD receive vì willmount chỉ gọi 1 lần trk khi form chưa hiện ra
+    // lúc này form đang ở trạng thái true nên pải sử dụng componentWillReceiveProps để lấy data 
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        if(nextProps && nextProps.taskEdit){ //kiểm tra điều kiện có tồn tại nextProps và props taskEdit không
+            // cập nhật lại setState
+            this.setState({
+                id: nextProps.taskEdit.id,
+                name: nextProps.taskEdit.name,
+                status: nextProps.taskEdit.status
+            })
+        }
+        // Vì khi ấn vào thêm cv khi form cập nhật cv đang hiện thì lúc này giá trị taskEditting đã null 
+        // và giá trị của form đc cập nhật khi ta set lại giá trị của taskForm
+        // trong khi componentWillMount không có gọi nên để reset đc giá trị đó đi thì ta kiểm tra điều kiện tại
+        // componentWillReceiveProps khi taskEdit có giá trị null thì ta reset lại form
+        else if(nextProps && nextProps.taskEdit === null){
+            this.setState({
+                id: '', //bổ sung thêm state id để update item
+                name: '', //trùng với name ở dưới
+                status: true //trùng với name ở dưới
+            })
+        }
+    }
+    
     //Hàm thực hiện bắt sự kiện click từ con truyền sang cha (App) để thực hiện thay đổi trạng thái thông qua props
     onHandleCloseForm = () => {
         this.props.onRetriveForm();
@@ -16,7 +52,7 @@ export default class TaskForm extends Component {
     // Hàm bắt sự kiện thay đổi trong form để lấy dữ liệu
     onChangeTaskForm = (event) => {
         let target = event.target;
-        let name = target.name;
+        let name = target.name; 
         let value = target.value;
         // covert string -> boolen dành cho select
         if(name === 'status'){
@@ -37,7 +73,7 @@ export default class TaskForm extends Component {
         //hàm đóng form
         this.onHandleCloseForm();
     }
-    //
+    //hàm clear form khi submit
     onClearForm = () => {
         this.setState({
             name: '',
@@ -49,7 +85,7 @@ export default class TaskForm extends Component {
         // 
         return (
             <div className="card">
-                <div className="card-header bg-success">Thêm công việc 
+                <div className="card-header bg-success">{this.state.id !== '' ? "Cập nhật công việc" : "Thêm công việc"}
                 <button type="button" 
                     className="close" 
                     data-dismiss="alert"
