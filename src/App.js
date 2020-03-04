@@ -4,6 +4,7 @@ import Control from './components/Control'
 import TaskList from './components/TaskList'
 import { v4 as uuidv4 } from 'uuid';
 import "./App.css";
+import {findIndex,filter} from 'lodash';
 export default class App extends Component {
     constructor(props) {
         super(props);
@@ -14,6 +15,13 @@ export default class App extends Component {
             filters : {
                 name: '',
                 status: -1
+            },
+            keywords: '',
+            // sortBy:'name',
+            // sortValue: 1
+            sorts:{
+                by: 'name',
+                value: 1
             }
         }
     }
@@ -108,7 +116,10 @@ export default class App extends Component {
     //hàm lấy id từ con (TaskList) - con (TaskItem) -> thực hiện update status
     onUpdate = (id) => {
         var {tasksKey} = this.state;
-        var indexTask = this.findIndexTask(id); //biến để trả về giá trị index của object
+        // var indexTask = this.findIndexTask(id); //biến để trả về giá trị index của object
+        var indexTask = findIndex(tasksKey, (tasksKey)=>{
+            return tasksKey.id === id;
+        })
         if(indexTask !== -1){ //Giá trị indexTask (index) có tồn tại
             tasksKey[indexTask].status = !tasksKey[indexTask].status; //trỏ từ arr tasksKey của index đó tới status
             this.setState({
@@ -169,6 +180,29 @@ export default class App extends Component {
         })
     }
 
+    // hàm search
+    onSearch = (keyword) => {
+        this.setState({
+            keywords : keyword.toLowerCase()
+        })
+    }
+    // Sử dụng C1 
+    // onSort = (sortBy,sortValue) => {
+    //     this.setState({
+    //         sortBy: sortBy,
+    //         sortValue: sortValue
+    //     })
+    // }
+
+    //Sử dụng cách 2 async & await
+    onSort = (data) => {
+        this.setState({
+            sorts: {
+                by: data.by,
+                value: data.value
+            }
+        })
+    } 
     // Hàm tìm vị trí index từ id
     findIndexTask = (id) => {
         var {tasksKey} = this.state;
@@ -180,9 +214,21 @@ export default class App extends Component {
         })
         return result;
     }
+    // 
+    onDeleteAll = () => {
+        this.setState({
+            tasksKey: []
+        })
+        localStorage.setItem('tasksKey',[]);
+    }
     render() {
         //lấy dữ liệu từ state 
-        var {isDisplayForm,tasksKey,taskEditting,filters} = this.state; // var tasksKey = this.state.tasksKey;
+        var {
+            isDisplayForm,tasksKey,
+            taskEditting,filters,keywords,
+            // sortBy,sortValue
+            sorts
+        } = this.state; // var tasksKey = this.state.tasksKey;
         //Đoạn script xử lý filter
         if(filters){
             if(filters.name){
@@ -201,6 +247,53 @@ export default class App extends Component {
                     }
                 })
         }
+        // Sử dụng js thuần
+        // if(keywords){
+        //     tasksKey = tasksKey.filter((tasksKey)=>{
+        //         return tasksKey.name.toLowerCase().indexOf(keywords) !== -1;
+        //     })
+        // }
+
+        // Sử dụng lodash
+        if(keywords){
+            tasksKey = filter(tasksKey,(tasksKey)=>{
+                return tasksKey.name.toLowerCase().indexOf(keywords) !== -1;
+            })
+        }
+
+        // Sử dụng C1 là truyền trực tiếp sang 
+        // if(sortBy === "name"){
+        //     tasksKey.sort((a,b)=>{
+        //         if(a.name > b.name) return sortValue;
+        //         else if(a.name < b.name) return -sortValue;
+        //         else return 0;
+        //     })
+        // }
+        // else {
+        //     tasksKey.sort((a,b)=>{
+        //         if(a.status > b.status) return -sortValue;
+        //         else if(a.status < b.status) return sortValue;
+        //         else return 0;
+        //     })
+        // }
+
+        // Sử dụng cách 2 là làm bình thường như filter do đã fix bằng bất đồng bộ async & await
+        if(sorts){
+            if(sorts.by === "name"){
+                tasksKey.sort((a,b)=>{
+                    if(a.name > b.name) return sorts.value;
+                    else if(a.name < b.name) return -sorts.value;
+                    else return 0;
+                })
+            }
+            else {
+                tasksKey.sort((a,b)=>{
+                    if(a.status > b.status) return -sorts.value;
+                    else if(a.status < b.status) return sorts.value;
+                    else return 0;
+                })
+            }
+        }
         // props onRetriveForm để thông qua component con (TaskForm) thực hiện hàm
         var elementTaskForm = (isDisplayForm === true) 
                                             ? <TaskForm 
@@ -210,7 +303,7 @@ export default class App extends Component {
                                             /> : '';
         return (
             <div>
-                <h2 className="text-center mt-4 mb-4">Quản lý công việc</h2>
+                <h2 className="text-center pt-4 mb-4 title-h2">QUẢN LÝ CÔNG VIỆC</h2>
                 <div className="container">
                     <div className="row">
                     {/* Check điều kiện isDisplayForm */}
@@ -219,13 +312,20 @@ export default class App extends Component {
                             {elementTaskForm}
                         </div>
                         {/* Check điều kiện isDisplayForm để hiển thị component*/}
-                        <div className={isDisplayForm === true ? "col-sm-12 col-md-8" : "col-sm-12 col-md-12"}>
+                        <div className={isDisplayForm === true ? "col-sm-12 col-md-8 mt-3" : "col-sm-12 col-md-12"}>
                             <button 
-                            className="btn btn-success"
+                            className="btn btn-success btns"
                             onClick={this.onToggleTaskForm} //Bắt sự kiện click -> hiện, ẩn task form
                             >
                                 <i className="fa fa-plus-circle"></i>
                                 &nbsp;Thêm công việc
+                            </button>
+                            <button 
+                            className="btn btn-danger ml-2 btns"
+                            onClick={this.onDeleteAll} //Bắt sự kiện click -> hiện, ẩn task form
+                            >
+                                <i className="fa fa-trash"></i>
+                                &nbsp;Xóa hết công việc
                             </button>
                             {/* <button 
                             className="btn btn-danger ml-2"
@@ -234,7 +334,12 @@ export default class App extends Component {
                             Generate
                             </button> */}
                             {/* Control Search - Sort*/}
-                            <Control />
+                            <Control 
+                                onRetriveSearchTask={this.onSearch}
+                                onRetriveSortTask={this.onSort}
+                                // onSortBy={sortBy}
+                                // onSortValue={sortValue}
+                            />
                             {/* TaskList - Table */}
                             {/* tạo props để chuyển dữ liệu từ component cha (App) sang component con (TaskList) */}
                             <TaskList 

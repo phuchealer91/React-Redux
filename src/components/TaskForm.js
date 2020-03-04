@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-
 export default class TaskForm extends Component {
         constructor(props) {
             super(props);
             this.state = {
                 id: '', //bổ sung thêm state id để update item
                 name: '', //trùng với name ở dưới
+                date: '',
                 status: true //trùng với name ở dưới
             }
         }
@@ -16,6 +16,7 @@ export default class TaskForm extends Component {
             this.setState({
                 id: this.props.taskEdit.id,
                 name: this.props.taskEdit.name,
+                date: this.props.taskEdit.date,
                 status: this.props.taskEdit.status
             }) 
         }
@@ -29,6 +30,7 @@ export default class TaskForm extends Component {
             this.setState({
                 id: nextProps.taskEdit.id,
                 name: nextProps.taskEdit.name,
+                date: nextProps.taskEdit.date,
                 status: nextProps.taskEdit.status
             })
         }
@@ -40,6 +42,7 @@ export default class TaskForm extends Component {
             this.setState({
                 id: '', //bổ sung thêm state id để update item
                 name: '', //trùng với name ở dưới
+                date: '',
                 status: true //trùng với name ở dưới
             })
         }
@@ -73,10 +76,12 @@ export default class TaskForm extends Component {
         //hàm đóng form
         this.onHandleCloseForm();
     }
+
     //hàm clear form khi submit
     onClearForm = () => {
         this.setState({
             name: '',
+            date: '',
             status: true
         })
     } 
@@ -106,6 +111,16 @@ export default class TaskForm extends Component {
                              value={this.state.name} //giữ value trong input
                              onChange={this.onChangeTaskForm} //sẽ lấy dữ liệu khi thay đổi.. 
                             />
+                        </div>
+                        <div className="form-group">
+                            <label >Thời gian</label>
+                            <input  
+                            name="date"  
+                            type="date" 
+                            value={ this.state.date } 
+                            className="form-control"  
+                            onChange={this.onChangeTaskForm} />
+                            
                         </div>
                         <div className="form-group">
                             <label >Trạnng thái</label>

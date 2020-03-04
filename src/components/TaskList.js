@@ -40,20 +40,20 @@ export default class TaskList extends Component {
                     />
         })
         return (
-            <div className="form-group">
+            <div className="form-group table-responsive">
                 <table className="table table-striped text-center">
                     <thead>
                         <tr>
                             <th>STT</th>
                             <th>Tên</th>
+                            <th>Thời gian</th>
                             <th>Trạng thái</th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td></td>
-                            <td>
+                            <td colSpan="3">
                                 <div className="form-group">
                                         <input 
                                         type="text" 
@@ -64,7 +64,7 @@ export default class TaskList extends Component {
                                         />
                                 </div>
                             </td>
-                            <td>
+                            <td colSpan="2">
                                 <div className="form-group">
                                     <select 
                                     className="form-control"
@@ -77,7 +77,6 @@ export default class TaskList extends Component {
                                     </select>
                                 </div>
                             </td>
-                            <td></td>
                         </tr>
                         {/* Task Item */}
                         {elements}
