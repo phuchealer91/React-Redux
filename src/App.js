@@ -5,6 +5,7 @@ import TaskList from './components/TaskList'
 import { v4 as uuidv4 } from 'uuid';
 import "./App.css";
 import {findIndex,filter} from 'lodash';
+import demo from './tranning/demo';
 export default class App extends Component {
     constructor(props) {
         super(props);
